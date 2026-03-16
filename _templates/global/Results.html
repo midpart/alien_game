@@ -1,0 +1,27 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    {% if is_training %}
+        <div style="color:red">These are the results for the training trials – they do not count towards your performance in this task</div>
+    {% else %}
+        Results
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    <h4>In this block, you accumulated <span>{{ round_payoff }}</span></h4>
+    {% if player.round_number > 1 %}
+        <h4>In this task, in total, you accumulated <span>{{ total_payoff }}</span></h4>
+    {% endif %}
+    {% next_button %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+         window.onload = function() {
+             document.title = "Results";
+         };
+    </script>
+{% endblock %}
+

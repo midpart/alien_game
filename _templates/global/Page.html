@@ -1,0 +1,33 @@
+{% extends "otree/Page.html" %}
+{% load otree static %}
+
+{% block global_styles  %}
+    <link href="{% static 'global/favicon.ico' %}" rel="shortcut icon" />
+{% endblock %}
+
+{% block global_scripts  %}
+    <script>
+        window.document.title = "Study";
+
+        let buttonClicksJson = "";
+
+        $(document).ready(function() {
+            $(".btn").on('click', function (event){
+                let id = $(this).prop("id");
+
+                if(typeof event.result === 'undefined'){
+                    return;
+                }
+
+                if ($(this).hasClass("otree-btn-next")){
+                    return;
+                }
+
+                // We don't store clicks to next button or to alien product changes
+                if (id !== "next_button" && !id.includes("alienProduct")) {
+                    liveSend(JSON.stringify({"click_time": Date.now() / 1000.0, "result": event.result}));
+                }
+            });
+        });
+    </script>
+{% endblock %}

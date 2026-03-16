@@ -1,0 +1,28 @@
+{% extends "global/Page.html" %}
+{% load otree %}
+
+{% block app_scripts %}
+
+    {% if player.comprehension_times > 1 and not player.comprehension_times >= Constants.comprehension_trials %}
+        <script>
+			$('#warningModal').modal();
+        </script>
+		
+	{% endif %}
+	
+	{% if player.comprehension_times == Constants.comprehension_trials %}
+		<script>
+            let htmlBody = '<p>You have answered at least one of these questions incorrectly. Please read the instructions, carefully, and try again.</p><p><b>IMPORTANT: If next time you will not answer these question correctly, you will be automatically forwarded to the next task, losing the opportunity of gaining a bonus in this task.</b></p>';
+			$('#warningModal .modal-body').html(htmlBody);
+			$('#warningModal').modal();
+        </script>
+	{% endif %}
+
+    {% if player.comprehension_times > Constants.comprehension_trials %}
+		<script>
+            let htmlBody = '<p>You have answered at least one of these questions incorrectly.</p><p><b>You failed this comprehension check more than 5 times, so that you will skip this task, and will not be paid a bonus for this task.</b></p>';
+			$('#warningModal .modal-body').html(htmlBody);
+			$('#warningModal').modal();
+        </script>
+	{% endif %}
+{% endblock %}

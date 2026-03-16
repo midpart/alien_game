@@ -1,0 +1,22 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+    Comprehension Questions
+{% endblock %}
+
+{% block content %}
+    {% formfields %}
+    {% next_button %}
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        $('input[name ="last_recorded_time"]').hide();
+        $('label[for="id_last_recorded_time"]').hide();
+
+        $(".otree-btn-next").click(function(event){
+            $('input[name ="last_recorded_time"]').val(Date.now().toString());
+        });
+    </script>
+{% endblock %}

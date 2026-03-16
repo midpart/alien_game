@@ -1,0 +1,609 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block app_styles %}
+    <style>
+        .flex {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            flex-direction: column;
+            width: fit-content;
+            margin: 0 auto;
+        }
+        .otree-body {
+            max-width: fit-content;
+        }
+        .btn-grey-box {
+            color: #5a6268 !important;
+            background-color: #5a6268 !important;
+        }
+        .player-column {
+            background-color: rgb(185, 185, 185);
+        }
+        #next_button {
+            display: none;
+        }
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+            width: 100%;
+            padding: 5px 12px;
+            margin: 0 auto;
+        }
+        .table-container {
+            display: flex;
+            justify-content: center;
+            overflow-y: scroll;
+            height: 265px;
+        }
+        td {
+            background-color: red;
+            max-width: fit-content;
+            white-space:nowrap;
+        }
+        .table>:not(caption)>*>*.player-column {
+            background-color: rgb(185, 185, 185);
+            display: flex;
+            flex-direction: column;
+        }
+        .table>:not(caption)>*>td[id*='products']{
+            max-width: 100%;
+            white-space:nowrap;
+        }
+        #table {
+            width: 100%;
+        }
+        #chat {
+            width: 100%;
+        }
+        .otree-chat {
+            margin: 0 auto;
+        }
+        .otree-chat__input {
+            width: 90%;
+        }
+        .row>* {
+            padding: 0;
+        }
+        .buttons-container button {
+            width: 15rem;
+        }
+        .end-chat-message {
+            overflow-wrap: word-wrap;
+            color: red;
+            font-weight: bold;
+        }
+        .end-chat-message .otree-chat__nickname {
+            color: red !important;
+            width: fit-content;
+        }
+        .join-chat-message {
+            overflow-wrap: word-wrap;
+            color: rgb(0, 150, 7);
+            font-weight: bold;
+        }
+        .join-chat-message .otree-chat__nickname {
+            color: rgb(0, 150, 7) !important;
+            width: fit-content;
+        }
+         
+    </style>
+{% endblock %}
+
+{% block title %}
+    {% if is_training %}
+        <div style="color:red">Practice block with {{ total_trials }} trials</div>
+    {% else %}
+        Block {{ round_counter }} out of {{ rounds }}
+    {% endif %}
+
+{% endblock %}
+
+{% block content %}
+    <input id="num_aliens" type="hidden" value="{{ number_of_pictures }}"/>
+    <input id="trial" type="hidden" value='{{ trial_number }}'/>
+    <div style="display: none">
+    </div>
+        <div class="container text-lg-right">
+            <h2><span id="trialBadge" class="badge badge-pill">Trial {{ trial_number }} out of {{ total_trials_minus_one }}</span></h2>
+    </div>
+
+    <div class="flex">
+        <!--<div>
+            {{ chat nickname=nickname }}
+        </div>-->
+        <div class="table-container">
+            <div class="row w-100">
+                    <div class="table-responsive">
+                        <table id="table" class="table table-bordered table-sm">
+                            <thead>
+                                <tr>
+                                <th class="text-center" scope="col">#</th>
+                                {% for player in players %}
+                                {% if player.id_in_group == player_id_raw %}
+                                <th class="text-center player-column" scope="col">P{% player.id_in_group %}<div>(You)</div></th>
+                                {% else %}
+                                <th class="text-center" scope="col">P{% player.id_in_group %}</th>
+                                {% endif %}
+                                {% endfor %}
+                                {% for player in players %}
+                                <th class="text-center" scope="col" id="P{{ player.id_in_group }}-payoff">P{% player.id_in_group %} Payoff</th>
+                                {% endfor %}
+                                <th class="text-center" scope="col" id="group-payoff">Joint Payoff</th>
+                                </tr>
+                            </thead>
+                            <tbody id="tableBody">
+                            {% for i in trial_list %}
+                                <tr>
+                                    <th scope="row"> {{ forloop.counter0 }} </th>
+                                    {% for player in players %}
+                                        <td id='products{{ i }}'>
+                                            {% for id, h in all_bounds.items %}
+                                                {% if id == player.id_in_group %}
+                                                    {% for n in h %}
+                                                        {% for key, symbol in alien_symbols.items %}
+                                                            {% if n == key %}
+                                                                {% if key >= lower_bound and key < upper_bound %}
+                                                                    <button id="alienProduct{{ i }}{{ forloop.counter0 }}"
+                                                                    class="btn btn-xs btn-secondary btn-grey-box ml-2 mr-1 disabled {{ player_id }}" style="white-space:nowrap;" onclick="onProductClick(this.id, true)" type="button">
+                                                                    {{ symbol }}
+                                                                    </button>
+                                                                {% else %}
+                                                                    <button id="alienProduct{{ i }}{{ forloop.counter0 }}"
+                                                                    class="btn btn-xs btn-secondary ml-2 mr-1 disabled" style="white-space:nowrap; cursor: default;" type="button">
+                                                                    {{ symbol }}
+                                                                    </button>
+                                                                {% endif %}
+                                                            {% endif %}
+
+                                                        {% endfor %}
+                                                    {% endfor %}
+                                                {% endif %}
+                                            {% endfor %}
+                                        </td>
+                                    {% endfor %}
+
+                                    {% for player in players %}
+                                    <td scope="row" class="text-center">
+                                        <h5 class="mt-1" id="p{{ player.id_in_group }}-payoff{{ i }}"></h5>
+                                    </td>
+                                    {% endfor %}
+
+                                    <td scope="row" class="text-center">
+                                        <h5 class="mt-1" id="group-payoff{{ forloop.counter0 }}"></h5>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+            </div>
+        </div>
+        <div class="buttons-container">
+            <button id="end-chat" class="btn btn-primary ml-2" type="button">End Chat</button>
+            <button id="submit" class="btn btn-primary ml-2" type="button">Submit</button>
+        </div>
+        <div id="chat">
+            {% chat channel=channel %}
+        </div>
+        <button id="next_button" name="next_button" class="btn btn-primary">Next</button>
+    </div>
+
+    <div style="display: none">
+      <button id="submit_form"></button>
+    </div>
+{% endblock %}
+
+{% block scripts %}
+    <script>
+        let numberOfTrials = {{ total_trials|safe }};
+        let alienSymbols = {{ alien_symbols|safe }};
+        let numAliens = {{ number_of_pictures }};
+        let round = {{ round }};
+        let trial = {{ trial_number }};
+        let selections = {{ selections|safe }};
+        let joint_payoffs = {{ joint_payoffs|safe }};
+        let payoffs = {{ payoffs|safe }}
+        let playerId = js_vars.player_id
+        let num_players = {{ num_players|safe }}
+
+        let endChatBtn = document.getElementById("end-chat");
+        let submitBtn = document.getElementById("submit");
+        let nextBtn = document.querySelector("#next_button");
+        let chatSendBtn = document.querySelector(".otree-chat__btn-send");
+        let chatInput = document.querySelector(".otree-chat__input");
+        let chatPhaseIsFirst = true;
+
+        let chatMessages = document.querySelector(".otree-chat__messages");
+
+        let totalChat = {};
+
+         window.onload = function() {
+             document.title = "";
+             if(!selections.length){return;}
+             console.log(payoffs);
+             for (let i=0; i<selections.length; i++){
+                let buttons = selectButtons(i);
+                let selection = Array.from(selections[i]);
+                setButtons(buttons, selection);
+                let payoffId = "#payoff" + (i);
+                $(`#group-payoff0`).text(joint_payoffs[i]);
+
+                for (let j = 0; j < num_players; j++) {
+                    $(`#p${j+1}-payoff0`).text(payoffs[j][i]);
+                }
+
+                // $('#p1-payoff0').text(p1_payoffs[i]);
+                // $('#p2-payoff0').text(p2_payoffs[i]);
+             }
+
+             endChatBtn.addEventListener("click", () => {
+                disableChat();
+                enableButtonsRow(trial);
+             });
+
+            chatSendBtn.addEventListener("click", (e) => {
+                if (e.pointerId !== 1) return;
+                if (document.querySelector(".otree-chat__input").value.trim() === "") return;
+
+                let chat = "";
+
+                let data = {
+                    "chat": "",
+                    "trial": trial
+                }
+
+                setTimeout(() => {
+                        let newestMsg;
+
+                        for (let i = 0; i < chatMessages.children.length; i++)
+                        {
+                            let messageElement = chatMessages.children[i];
+
+                            console.log(messageElement);
+                            console.log
+
+                            if (messageElement.children[1].innerHTML === " has ended the chat. You will no longer be able to communicate in this trial." || 
+                                messageElement.children[1].innerHTML === " has ended the chat. You will no longer be able to communicate." ||
+                                messageElement.children[1].innerHTML === " has joined the chat. You can now communicate again.") {
+                                    continue;
+                            }
+                            
+                            let playerString = messageElement.children[0].innerHTML;
+                            let playerMessageId = playerString.slice(-1);
+
+                            if (!Number.isNaN(playerMessageId)) {
+                                playerMessageId = playerString.slice(12, 13);
+                            }
+
+                            let msg = `P${playerMessageId}: '${messageElement.children[1].innerHTML}'§`;
+                            chat += msg;
+                            totalChat[trial] += msg;
+                            newestMsg = msg;
+                        }
+                        
+                        console.log(totalChat);
+                        data["chat"] = newestMsg;
+                        liveSend(data);
+                    }, 100);
+            });
+
+            document.querySelector(".otree-chat__input").addEventListener("keydown", (e) => {
+                if (e.code !== "Enter") return;
+                if (document.querySelector(".otree-chat__input").value.trim() === "") return;
+
+                let chat = "";
+
+                let data = {
+                    "chat": "",
+                    "trial": trial
+                }
+
+                setTimeout(() => {
+                    let newestMsg;
+                        for (let i = 0; i < chatMessages.children.length; i++)
+                        {
+                            let messageElement = chatMessages.children[i];
+
+                            console.log(messageElement);
+
+                            if (messageElement.children[1].innerHTML === " has ended the chat. You will no longer be able to communicate in this trial." || 
+                                messageElement.children[1].innerHTML === " has ended the chat. You will no longer be able to communicate." ||
+                                messageElement.children[1].innerHTML === " has joined the chat. You can now communicate again.") {
+                                    continue;
+                            }
+
+                            let playerString = messageElement.children[0].innerHTML;
+                            let playerMessageId = playerString.slice(-1);
+
+                            if (!Number.isNaN(playerMessageId)) {
+                                playerMessageId = playerString.slice(12, 13);
+                            }
+
+                            let msg = `P${playerMessageId}: '${messageElement.children[1].innerHTML}'§`;
+                            chat += msg;
+                            totalChat[trial] += msg;
+                            newestMsg = msg;
+                            console.log(msg);
+                            console.log(chat);
+                        }
+                        
+                        console.log(totalChat);
+                        data["chat"] = newestMsg;
+                        liveSend(data);
+                    }, 100);
+            });
+
+            for (let i = 0; i < numberOfTrials; i++) {
+                totalChat[i+1] = "";
+            };
+
+             submitBtn.disabled = true;
+            
+             setButtons(selectButtons(selections.length), selections[selections.length - 1]);
+
+             if (chatPhaseIsFirst) return;
+
+             enableButtonsRow(trial);
+        
+         };
+
+         function disableChat(e) {
+            sendMessageOnLeaveChat();
+            liveSend({"end_chat": playerId, "playerOrigin": playerId});
+            chatSendBtn.disabled = true;
+            chatInput.disabled = true;
+            changeFlowButtons(0);
+         }
+
+         function enableChat() {
+            chatSendBtn.disabled = false;
+            chatInput.disabled = false;
+
+            sendMessageOnJoinChat();
+         }
+
+         function sendMessageOnLeaveChat() {
+            chatInput.value = " has ended the chat. You will no longer be able to communicate.";
+            chatSendBtn.click();
+            setTimeout(() => {
+                chatMessages.lastChild.classList.add("end-chat-message");
+                chatMessages.lastChild.lastChild.innerHTML = " has ended the chat. You will no longer be able to communicate in this trial."
+            }, 100);
+         }
+
+         function sendMessageOnJoinChat() {
+            chatInput.value = " has joined the chat. You can now communicate again.";
+            chatSendBtn.click();
+            setTimeout(() => {
+                chatMessages.lastChild.classList.add("join-chat-message");
+                chatMessages.lastChild.lastChild.innerHTML = " has joined the chat. You can now communicate again."
+            }, 100);
+            liveSend({"join_chat": playerId, "playerOrigin": playerId});
+         }
+
+         function changeFlowButtons(state) {
+            if (state == 0) {
+                endChatBtn.disabled = true;
+                submitBtn.disabled = false;
+            } else if (state == 1) {
+                endChatBtn.disabled = false;
+                submitBtn.disabled = true;
+            }
+            else {
+                endChatBtn.disabled = true;
+                submitBtn.disabled = true;
+                nextBtn.style.display = "initial";
+            }
+         }
+
+         function disableSubmit(submitId) {
+            let submit = document.getElementById("submit"+submitId);
+            submit.classList.add("disabled");
+            submit.disabled = true;
+            submit.onclick = null;
+         }
+
+         function disableSubmitById(btnId) {
+            let submit = document.getElementById(btnId);
+            submit.classList.add("disabled");
+            submit.disabled = true;
+            submit.onclick = null;
+         }
+
+         function enableSubmit() {
+            let submitIdNum = trial; 
+            let submit = document.getElementById("submit"+submitIdNum);
+            submit.classList.remove("disabled");
+            submit.classList.add("btn-dark");
+            submit.disabled = false;
+         }
+
+        function setButtons(buttons, selection) {
+            for (let j=0; j<buttons.length; j++){
+                if (selection[j] === '1'){
+                    selectProduct(buttons[j]);
+                }
+                else{
+                    unselectProduct(buttons[j]);
+                }
+            }
+         }
+
+        function disableButtonsRow()
+        {
+            let buttons = selectButtons(trial);
+             for (let i=0; i<buttons.length;i++){
+                 buttons[i].classList.add('disabled');
+             }
+        }
+
+        function enableButtonsRow(){
+             let buttons = selectButtons(trial);
+             for (let i=0; i<buttons.length;i++){
+                 buttons[i].classList.remove('disabled');
+             }
+        }
+
+        function selectButtons(trial){
+            let id = "products" + trial;
+            let buttons = document.querySelectorAll("#" + id + ` .btn-xs`);
+            return $('#' + id + ' .btn-xs');
+        }
+
+        function selectPlayerButtons(trial){
+            let id = "products" + trial;
+            let buttons = document.querySelectorAll("#" + id + ` .btn-xs.p${playerId}-picture`);
+            return buttons;
+        }
+
+        let clickedItems = [];
+
+        function onProductClick(id, wasClickedByPlayer) {
+            let button = document.getElementById(id);
+            let isDisabled = button.classList.contains("disabled");
+
+            if (isDisabled) {
+                button.classList.remove("disabled");
+            }
+
+            if (button.classList.contains("disabled"))
+            {
+                return;
+            }
+
+            if(trial === 0){
+                if (!clickedItems.includes(id)) {
+                    clickedItems.push(id);
+                    button.classList.remove("btn-grey-box");
+                    let numAliens = document.getElementById("num_aliens").value;
+                    if (clickedItems.length === parseInt(numAliens)) {
+                       enableSubmit(0);
+                    }
+                    return;
+                }
+            }
+
+            if (button.classList.contains("btn-secondary")) {
+               unselectProduct(button);
+            }
+            else {
+               selectProduct(button);
+            }
+
+            if (isDisabled) {
+                button.classList.add('disabled');
+            }
+
+            if (!wasClickedByPlayer) return;
+
+            /*liveSend({
+                "buttonId": id,
+                "playerIdOrigin": playerId
+            });*/
+        }
+
+        function selectProduct(button) {
+            button.classList.remove("btn-grey-box");
+            button.classList.remove("btn-outline-light");
+            button.classList.remove("text-dark");
+            button.classList.add("btn-secondary");
+            button.classList.add("btn-dark");
+        }
+
+        function unselectProduct(button) {
+            button.classList.remove("btn-grey-box");
+            button.classList.remove("btn-secondary");
+            button.classList.remove("btn-dark");
+            button.classList.add("btn-outline-light");
+            button.classList.add("text-dark");
+        }
+
+        $('[id^=submit]').on('click', function (event){
+            let id = "products" + trial;
+            console.log(id);
+            console.log(trial);
+            let buttons = document.querySelectorAll("#" + id + ` .btn-xs.p${playerId}-picture`);
+            console.log(buttons);
+            let bitstring = "";
+            for (let i=0; i<buttons.length; i++) {
+                let b = buttons[i];
+                b.classList.add("disabled");
+                if (b.classList.contains("btn-outline-light")) {
+                    bitstring = bitstring.concat("0");
+                }
+                else{
+                    bitstring = bitstring.concat("1");
+                }
+            }
+
+            disableButtonsRow();
+            
+            submitBtn.disabled = true;
+
+            //return bitstring;
+            return {
+                bitstring,
+                playerId
+            }
+        });
+
+        function liveRecv(data) {
+            /*if ('buttonId' in data) {
+                return;
+            }*/
+
+            if ('endChat' in data) {
+                if (data['playerOrigin'] != playerId)
+                {
+                    chatMessages.lastChild.classList.add("end-chat-message");
+                }
+                return;
+            }
+
+            if ('joinChat' in data) {
+                if (data['playerOrigin'] != playerId)
+                {
+                    chatMessages.lastChild.classList.add("join-chat-message");
+                }
+                return;
+            }
+
+            trial = data["row"];
+            console.log(data);
+            let payoffP1 = data["p1_payoff"];
+            let payoffP2 = data["p2_payoff"];
+            let payoffs = data["payoffs"];
+            let groupPayoff = data["joint_payoff"];
+
+            $(`#group-payoff${(trial-1)}`).text(groupPayoff);
+
+            for (let i = 0; i < num_players; i++) {
+                $(`#p${i+1}-payoff${(trial-1)}`).text(payoffs[i]);
+            }
+
+            //$(`#p1-payoff${(trial-1)}`).text(payoffP1);
+            //$(`#p2-payoff${(trial-1)}`).text(payoffP2);
+
+            if (trial < numberOfTrials){
+                setButtons(selectButtons(trial-1), data["selection"]);
+                setButtons(selectButtons(trial), data["selection"]);
+                changeFlowButtons(1);
+                enableChat();
+                //enableButtonsRow(trial);
+                //enableSubmit(trial);
+                $('#trialBadge').text("Trial " +  (trial)  + " out of " + (numberOfTrials - 1));
+            }
+
+            if (trial === numberOfTrials) {
+                setButtons(selectButtons(trial-1), data["selection"]);
+                $('#next_button').attr('disabled', false);
+                changeFlowButtons(3);
+            }
+        }
+
+    </script>
+{% endblock %}

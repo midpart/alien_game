@@ -1,0 +1,58 @@
+{% extends "global/InstructionScripts.html" %}
+{% load otree static %}
+
+{% block title %}
+    Task Instructions
+{% endblock %}
+
+{% block appstyles %}
+    <style>
+        img {
+            width: 100%;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    {% include "global/Instructions.html" %}
+    <p>
+        In this task you create pictures by selecting and/or deselecting symbols presented in a row across
+        {{ num_pictures }} columns (see screenshot below). There are {{ num_pictures }} different symbols and each row of symbols
+        represents a picture. An alien from outer space likes to buy such pictures and it will pay different amounts
+        for different pictures with different symbols, but you don’t know what the alien likes and how the
+        interconnectedness between the different symbols influences the payoff. A first example picture and
+        its payoff are already displayed.
+    </p>
+    <img src="{{ static image_path }}" class="img-fluid" alt="Screenshot"/>
+
+    <p>
+        You create every picture jointly with two other participant who you are randomly allocated to.
+        One of you is P1, the other two are P2 and P3. All of you are allocated to one area with four symbols that you
+        can select or deselect. P1 is responsible for the four symbols on the left, P2 is responsible for the four
+        symbols in the middle, and P3 is responsible for the four symbols on the right. Everyone can freely change
+        any symbol in your area, but you cannot make changes to symbols in the other participants’ areas. In every
+        round, you can change as many symbols as you wish (0-4), but you must make a decision for every symbol in
+        every round as the alien considers for the evaluation of the picture the entire combination from all areas.
+    </p>
+    <p>
+        Before you change any symbols, you must chat with the other participants.
+        When all of you decide to end the chat, and click on the corresponding button, you and the other participants
+        will be able to change the symbols in your area. When you’re ready with your choice of selected and not-selected
+        buttons in your area, you can click on the “Submit” button. After your and the other participants’ choices are
+        submitted, the ‘P1 Payoff’, ‘P2 Payoff’, and the ‘P3 Payoff’ will then be shown in addition to the
+        ‘Joint Payoff’, which is the accumulation of both individual payoffs. With the display of these payoffs,
+        the round is completed, and you can continue with the chat for the next round.
+    </p>
+    <p>
+        While you are not able to return to prior rounds, the alien is willing to buy the same combination more than
+        once; the payoff will then stay the same. Also note that you and the other participants have the exact same
+        information, i.e. you see all selected and not-selected symbols and payoffs in all areas in all prior rounds.
+        After submitting 10 pictures, the alien buys all pictures you jointly created and pays all of you the
+        accumulated price ‘Joint Payoff’. The value of the pictures will change when you move to the next alien
+        who will purchase the next block of {{ num_pictures }} pictures.
+    </p>
+    <p>
+        For this task, you will earn a bonus of 2 pence (£0.02) per 10 points
+    </p>
+    {% next_button %}
+{% endblock %}

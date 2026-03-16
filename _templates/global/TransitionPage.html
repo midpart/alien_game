@@ -1,0 +1,30 @@
+{% extends "global/Page.html" %}
+{% load otree static %}
+
+{% block title %}
+
+    {% if player.round_number == Constants.num_rounds %}
+        You have completed this task
+    {% else %}
+        Continue to the next block
+    {% endif %}
+{% endblock %}
+
+{% block content %}
+    {% if player.round_number == Constants.num_rounds %}
+	
+		{% if failedCheck %}
+			<p>In this task, you have earned a bonus of <span class="font-weight-bold">£{{ bonus }}</span> because you failed the comprehension check for this task more than 5 times.</p>
+			<p>However, you can still earn a bonus for upcoming tasks.</p>
+		{% else %}
+			<p>In this task, you have earned a bonus of <span class="font-weight-bold">£{{ bonus }}</span></p>
+        {% endif %}
+		
+		<p>Click the “Next” button to proceed.</p>
+    {% else %}
+        <p>You have completed the previous block. Everything is now reset and you will face a new block for this task.</p>
+    {% endif %}
+    {% next_button %}
+{% endblock %}
+
+

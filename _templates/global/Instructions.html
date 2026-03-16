@@ -1,0 +1,22 @@
+{% load otree static %}
+
+<div id="content">
+        <div id="warningModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="warningModalTitle" aria-hidden="true" data-backdrop="static">
+          <div class="modal-dialog modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="warningModalTitle">Warning</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <span aria-hidden="true">&times;</span>
+                </button>
+              </div>
+              <div class="modal-body">
+                  <p>You have answered at least one of these questions incorrectly. Please read the instructions, carefully, and try again.</p>
+              </div>
+              <div class="modal-footer">
+                <button {% if player.comprehension_times <= Constants.comprehension_trials %} type="button" data-dismiss="modal" {% endif %} class="btn btn-primary">Close</button>
+              </div>
+            </div>
+          </div>
+    </div>
+</div>
