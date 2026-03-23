@@ -59,8 +59,10 @@ class Player(BasePlayer):
 
     def is_comprehension_valid(self):
         comp_creature_buying = self.comp_creature_buying or ''
+        # if comp_creature_buying.upper().find(
+        #         'ALIEN') == -1 or self.comp_symbol_changes != 1 or self.comp_symbols_buy != 3:
         if comp_creature_buying.upper().find(
-                'ALIEN') == -1 or self.comp_symbol_changes != 1 or self.comp_symbols_buy != 3:
+                'ALIEN') == -1 or self.comp_symbol_changes != 2 or self.comp_symbols_buy != 3:
             self.reset_comprehension_fields()
             self.participant.vars['comprehension_valid'] = False
             return False

@@ -42,6 +42,9 @@ class Subsession(BaseSubsession):
                     "selections_payoff": {},
                     "p1_payoffs": {},
                     "p2_payoffs": {},
+                    "num_clicks": {},
+                    "module1_change": {},
+                    "module2_change": {},
                     "search_distance": {},
                     "active_search": {},
                     "alien_market": {},
@@ -67,6 +70,9 @@ class Subsession(BaseSubsession):
                 p.participant.vars["data"]["selections_payoff"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
                 p.participant.vars["data"]["p1_payoffs"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
                 p.participant.vars["data"]["p2_payoffs"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
+                p.participant.vars["data"]["num_clicks"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
+                p.participant.vars["data"]["module1_change"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
+                p.participant.vars["data"]["module2_change"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
                 p.participant.vars["data"]["search_distance"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
                 p.participant.vars["data"]["active_search"][self.round_number - 1] = list(range(1, Constants.num_rounds + 1))
                 p.participant.vars["data"]["results"][self.round_number - 1] = [[[""] for j in range(2)] for i in range(0, self.session.vars["training_trials"]-1)]
@@ -78,7 +84,7 @@ class Subsession(BaseSubsession):
                 p.participant.vars["data"]["results"][self.round_number - 1] = [[[""] for j in range(2)] for i in range(0, self.session.vars["max_trials"]-1)]
                 self.initialize_common(p)
 
-            print(p.participant.vars["data"])
+            # print(p.participant.vars["data"])
 
     def initialize_common(self, player):
         randomized_order = player.participant.vars["data"]['alien_randomized_order'][self.round_number - 1]
@@ -92,6 +98,9 @@ class Subsession(BaseSubsession):
         player.participant.vars["data"]["selections_payoff"][self.round_number - 1] = []
         player.participant.vars["data"]["p1_payoffs"][self.round_number - 1] = []
         player.participant.vars["data"]["p2_payoffs"][self.round_number - 1] = []
+        player.participant.vars["data"]["num_clicks"][self.round_number - 1] = []
+        player.participant.vars["data"]["module1_change"][self.round_number - 1] = []
+        player.participant.vars["data"]["module2_change"][self.round_number - 1] = []
         player.participant.vars["data"]['payoff'][self.round_number - 1] = 0.0
         player.participant.vars["data"]["best_selection"][self.round_number - 1] = 0
         player.participant.vars["data"]["best_payoff"][self.round_number - 1] = 0
@@ -112,6 +121,9 @@ class Player(BasePlayer):
     landscape_payoff_list = models.StringField()
     search_distance_list = models.StringField()
     active_search_list = models.StringField()
+    num_clicks_list = models.StringField()
+    module1_change_list = models.StringField()
+    module2_change_list = models.StringField()
 
     presentation_order = models.IntegerField()
 
@@ -121,6 +133,9 @@ class Player(BasePlayer):
         player.landscape_payoff_list = str(player.participant.vars["data"]["selections_payoff"][player.round_number - 1])
         player.search_distance_list = str(player.participant.vars["data"]["search_distance"][player.round_number - 1])
         player.active_search_list = str(player.participant.vars["data"]["active_search"][player.round_number - 1])
+        player.num_clicks_list = str(player.participant.vars["data"]["num_clicks"][player.round_number - 1])
+        player.module1_change_list = str(player.participant.vars["data"]["module1_change"][player.round_number - 1])
+        player.module2_change_list = str(player.participant.vars["data"]["module2_change"][player.round_number - 1])
 
     def set_alien_selection_result(self, bitstring):
         values = self.participant.vars["data"]["alien_market"][self.round_number - 1].get_new_lookup_values(bitstring)
@@ -212,9 +227,36 @@ class Player(BasePlayer):
 
         return lower_bound, upper_bound
 
+    def has_change(self, string1, string2):
+        changes = 0
+        for i in range(len(string1)):
+            if string1[i] != string2[i]:
+                changes += 1
+        
+        changes_bool = False
+        if changes > 0:
+            changes_bool = True
+        
+        return changes_bool
+
     def live_selection(self, data):
         data = json.loads(data)
-        result = data["result"]
+        result_long = data["result"]
+        results = result_long.split("_")
+        result = results[0]
+        num_clicks = ""
+        module1_change = ""
+        module2_change = ""
+        if len(results) >= 2:
+            num_clicks = results[1]
+        if len(results) >= 3:
+            module1_change = results[2]
+        if len(results) >= 4:
+            module2_change = results[3]
+
+        self.participant.vars["data"]["num_clicks"][self.round_number - 1].append(num_clicks)
+        self.participant.vars["data"]["module1_change"][self.round_number - 1].append(module1_change)
+        self.participant.vars["data"]["module2_change"][self.round_number - 1].append(module2_change)
 
         self.participant.vars["data"]['results'][self.round_number - 1][self.participant.vars["data"]["trial_number"][self.round_number - 1] - 2][0] = result[:5]
         self.participant.vars["data"]['results'][self.round_number - 1][self.participant.vars["data"]["trial_number"][self.round_number - 1] - 2][1] = result[5:]
@@ -227,8 +269,6 @@ class Player(BasePlayer):
 
         values = self.participant.vars["data"]['results'][self.round_number - 1][self.participant.vars["data"]["trial_number"][self.round_number - 1] - 2]
         bitstring = str(values[0] + values[1])
-
-        print(bitstring)
 
         self.set_alien_selection_result(bitstring)
         if self.round_number == 1:

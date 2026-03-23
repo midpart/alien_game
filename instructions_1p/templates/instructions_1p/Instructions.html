@@ -17,42 +17,20 @@
     {% include "global/Instructions.html" %}
     {% if modules == 2%}
     <p>
-        In this task you create pictures by selecting and/or deselecting symbols presented in a row across
-        {{ num_pictures }} columns (see screenshot below). There are 10 different symbols and each row of symbols
-        represents a picture. An alien from outer space likes to buy such pictures and it will pay different amounts
-        for different pictures with different symbols, but you don’t know what the alien likes and how the
-        interconnectedness between the different symbols influences the payoff. A first example picture and
-        its payoff are already displayed.
+        In this task you create pictures by selecting and/or deselecting symbols presented in a row of {{ num_pictures }} columns (see screenshot below). There are 10 different symbols and each row of symbols represents a picture. An alien from outer space likes to buy such pictures and it will pay different amounts for different pictures with different symbols, but you don’t know what the alien likes and how the interconnectedness between the different symbols influences the payoff. A first example picture and its payoff are displayed below. 
     </p>
     <img src="{{ static image_path }}" class="img-fluid" alt="Screenshot"/>
     <p>
-        You create every picture jointly with another participant who you are randomly allocated to. One of you is P1,
-        the other one is P2. Both of you are allocated to one area with five symbols that you can select or deselect.
-        P1 is responsible for the five symbols on the left, P2 is responsible for the five symbols on the right, and
-        both of you can freely change any symbol in your area, but you cannot make changes to symbols in the other
-        participant’s area. In every round, you can change as many symbols as you wish (0-5), but you must make a
-        decision for every symbol in every round as the alien considers for the evaluation of the picture the entire
-        combination from both areas.
+        Each picture is created by making changes in two modules, called M1 and M2. In each module there are five symbols that you can select or deselect. In every round, you must change exactly two symbols, otherwise you cannot proceed to the next round. Whether you make changes to M1 or M2 or both is entirely up to you. How changes affect the payoff that the alien pays is unknown and needs to be discovered. What is known is that the alien evaluates each picture based on the entire combination from both modules. 
     </p>
     <p>
-        Before you change any symbols, you must chat with the other participant. When both of you decide to end the
-        chat, and click on the corresponding button, you and the other participant will be able to change the symbols
-        in your area. When you’re ready with your choice of selected and not-selected buttons in your area, you can
-        click on the “Submit” button. After your and the other participants choices are submitted, the ‘P1 Payoff’
-        and the ‘P2 Payoff’ will then be shown in addition to the ‘Joint Payoff’, which is the accumulation of both
-        individual payoffs. With the display of these payoffs, the round is completed, and you can continue with the
-        chat for the next round.
+        After your choices are submitted, the ‘M1 Payoff’ and the ‘M2 Payoff’ will be shown in addition to the ‘Joint Payoff’, which is the sum of the M1 and M2 payoffs. With the display of these payoffs, the round is completed, and you can continue with the next round.
     </p>
     <p>
-        While you are not able to return to prior rounds, the alien is willing to buy the same combination more
-        than once; the payoff will then stay the same. Also note that you and the other participant have the exact
-        same information, i.e. you see all selected and not-selected symbols and payoffs in both areas in all prior
-        rounds.
+        Although you cannot return to previous rounds, you can always see all selected and not-selected symbols and payoffs in both modules in all prior rounds. 
     </p>
     <p>
-        The alien buys all the pictures that you jointly create in 4 rounds. The alien pays you the accumulated
-        ‘Joint Payoff’; the other participant also receives this payoff. For this task, you will earn a bonus of
-        2 pence (£0.02) per 10 points.
+        The alien buys all the pictures that you jointly create in a block. A block contains 10 rounds and there are three blocks in addition to a practice block (no payment for this block). The alien pays you the accumulated ‘Joint Payoff’. For this task, you will earn a bonus of 2 pence (£0.02) per 10 points. 
     </p>
     {% else %}
     <p>

@@ -11,13 +11,12 @@ class AlienMarket(Page):
     def is_displayed(self):
         self.player.total_time_spent = "0"
         self.player.participant.vars['start_time'] = str(time.time())
-        print(self.player.participant.vars["data"])
+        # print(self.player.participant.vars["data"])
         return self.player.participant.vars["data"]['trial_number'][self.round_number - 1] <= self.session.vars['max_trials']
 
     def vars_for_template(self):
         selections = self.player.participant.vars["data"]["selections"][self.round_number - 1]
         is_training = self.player.participant.vars["data"]["is_training"][self.round_number - 1]
-        print(is_training)
         trial_list = list(range(0, self.session.vars['training_trials'])) if is_training else list(
             range(0, self.session.vars['max_trials']))
         total_trials = self.session.vars['training_trials'] if is_training else self.session.vars['max_trials']
@@ -71,7 +70,8 @@ class Results(Page):
         total_payoff = sum([p.payoff for p in self.player.in_all_rounds()])
         return dict(round_payoff=self.player.payoff,
                     total_payoff=total_payoff,
-                    is_training=self.player.participant.vars["data"]["is_training"])
+                    is_training=self.player.participant.vars["data"]["is_training"][self.round_number - 1])
+                    
 
     def before_next_page(self):
         # reset payoff because of training trial
