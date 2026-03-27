@@ -10,9 +10,9 @@
 {% endblock %}
 
 {% block content %}
-    <h4>In this block, you accumulated <span>{{ round_payoff }}</span></h4>
+    <h4>In this block, you accumulated <span>{{ round_payoff }}.</span></h4>
     {% if player.round_number > 1 %}
-        <h4>In this task, in total, you accumulated <span>{{ total_payoff }}</span></h4>
+        <h4>In this experiment, in total, you have accumulated <span>{{ total_payoff }} points so far.</span></h4>
     {% endif %}
     {% next_button %}
 {% endblock %}

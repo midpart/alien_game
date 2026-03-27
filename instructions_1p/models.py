@@ -41,7 +41,7 @@ class Player(BasePlayer):
 
     comp_symbol_changes = models.IntegerField(
         label="2)	How many symbols can you, without your teammate, change from one trial to the next?",
-        choices=[[1, 'a) 0-5'], [2, 'b) 1'], [3, 'c) 1-5']]
+        choices=[[1, 'a) 0-5'], [2, 'b) 2'], [3, 'c) 1-5']]
     )
 
     comp_symbols_buy = models.IntegerField(
@@ -77,5 +77,5 @@ class Player(BasePlayer):
 
     def comp_symbol_changes_choices(self):
         value = int(self.session.config["number_of_pictures"] / self.session.config["modules"])
-        choices=[[1, f'a) 0-{value}'], [2, 'b) 1'], [3, f'c) 1-{value}']]
+        choices=[[1, f'a) 0-{value}'], [2, 'b) 2'], [3, f'c) 1-{value}']]
         return choices

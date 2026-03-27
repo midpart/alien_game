@@ -4,7 +4,7 @@
 {% block title %}
 
     {% if player.round_number == Constants.num_rounds %}
-        You have completed this task
+        You have completed this experiment
     {% else %}
         Continue to the next block
     {% endif %}
@@ -14,15 +14,15 @@
     {% if player.round_number == Constants.num_rounds %}
 	
 		{% if failedCheck %}
-			<p>In this task, you have earned a bonus of <span class="font-weight-bold">£{{ bonus }}</span> because you failed the comprehension check for this task more than 5 times.</p>
+			<p>You have earned a bonus of <span class="font-weight-bold">£{{ bonus }}</span> because you failed the comprehension check for this task more than 5 times.</p>
 			<p>However, you can still earn a bonus for upcoming tasks.</p>
 		{% else %}
-			<p>In this task, you have earned a bonus of <span class="font-weight-bold">£{{ bonus }}</span></p>
+			<p>You have earned a bonus of <span class="font-weight-bold">£{{ bonus }}</span></p>
         {% endif %}
 		
 		<p>Click the “Next” button to proceed.</p>
     {% else %}
-        <p>You have completed the previous block. Everything is now reset and you will face a new block for this task.</p>
+        <p>You have completed the previous block. Everything is now reset and you will face a new alien in this new block. Previous choices are not relevant in this new block.</p>
     {% endif %}
     {% next_button %}
 {% endblock %}
