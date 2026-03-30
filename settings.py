@@ -10,10 +10,18 @@ SESSION_CONFIGS = [
         modules=2
     ),
     dict(
+        name="alien_1p10i2mfsd",
+        display_name="Alien Game - 1 Participant / 10 Images / 2 Modules / Fixed SD",
+        num_demo_participants=1,
+        app_sequence=['instructions_1p_old', 'alien_game_1p_old'],
+        number_of_pictures=10,
+        modules=2
+    ),
+    dict(
         name="alien_1p12i1m",
         display_name="Alien Game - 1 Participant / 12 Images / 1 Module",
         num_demo_participants=1,
-        app_sequence=['instructions_1p', 'alien_game_1p'],
+        app_sequence=['instructions_1p_old', 'alien_game_1p_old'],
         number_of_pictures=12,
         modules=1
     ),
