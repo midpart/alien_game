@@ -75,7 +75,7 @@ class Results(Page):
         total_payoff = sum([p.payoff for p in self.player.in_all_rounds()])
         return dict(round_payoff=self.player.payoff,
                     total_payoff=total_payoff,
-                    is_training=self.player.session.vars[g_id]["is_training"])
+                    is_training=self.player.session.vars[g_id]["is_training"][self.round_number - 1])
 
     def before_next_page(self):
         # reset payoff because of training trial
